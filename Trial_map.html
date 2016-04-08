@@ -21,33 +21,27 @@
  Number.prototype.toDeg = function() {
    return this * 180 / Math.PI;
  }
- google.maps.LatLng.prototype.destinationPoint = function(brng, dist) {
-   dist = dist / 6371;  
-   brng = brng.toRad();  
+ google.maps.LatLng.prototype.distancefrom = function(latB, lngB) {
 
-   var lat1 = this.lat().toRad(), lon1 = this.lng().toRad();
+   // var lat1 = this.lat().toRad(), lon1 = this .lng().toRad();
 
-   var lat2 = Math.asin(Math.sin(lat1) * Math.cos(dist) + 
-    Math.cos(lat1) * Math.sin(dist) * Math.cos(brng));
-
-   var lon2 = lon1 + Math.atan2(Math.sin(brng) * Math.sin(dist) *
-    Math.cos(lat1), 
-    Math.cos(dist) - Math.sin(lat1) *
-    Math.sin(lat2));
-
-   if (isNaN(lat2) || isNaN(lon2)) return null;
-
-   return new google.maps.LatLng(lat2.toDeg(), lon2.toDeg());
- }
+  var R = 6378137; // Earth’s mean radius in meter
+  var dLat = (latB - this.lat()).toRad();
+  var dLong = (lngB - this.lng()).toRad();
+  var a = Math.sin(dLat / 2) * Math.sin(dLat/2) + Math.cos(this.lat().toRad()) * Math.cos(latB.toRad()) * Math.sin(dLong / 2)*Math.sin(dLong/2);
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  var d = R * c;
+  return d/1000;
+}
 
 
- var infowindow = new google.maps.InfoWindow(
- { 
+var infowindow = new google.maps.InfoWindow(
+{ 
   size: new google.maps.Size(150,50)
 });
 
 
- function createMarker(latlng, name, html) {
+function createMarker(latlng, name, html) {
   var contentString = html;
   var marker = new google.maps.Marker({
     position: latlng,
@@ -62,7 +56,9 @@
   marker.setAnimation(google.maps.Animation.BOUNCE);
   var pointA = new google.maps.LatLng(latlng.lat(),latlng.lng());   
   var radius = 300;                                
-
+  
+  console.log(pointA.distancefrom(17.446118,78.348741));
+  
   var circle = new google.maps.Circle({
    center: pointA,
          radius: radius * 1000,       // Convert to meters
