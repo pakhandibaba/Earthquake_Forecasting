@@ -15,6 +15,7 @@
   var marker = null;
   var circle = null;
   var List_lat = [] , List_lng = [];
+  var textFile = null;
 
   Number.prototype.toRad = function() {
    return this * Math.PI / 180;
@@ -42,65 +43,88 @@ var infowindow = new google.maps.InfoWindow(
   size: new google.maps.Size(150,50)
 });
 
-function readTextFile(file)
-{
-  var rawFile = new XMLHttpRequest();
-  var latflag =1 , lngflag =0;
-  var templat = "",templng = "";
-  List_lat = [] , List_lng = [];
-  rawFile.open("GET", file, false);
-  rawFile.onreadystatechange = function ()
+function makeTextFile(text) {
+  var data = new Blob([text], {type: 'text/plain'});
+
+    // If we are replacing a previously generated file we need to
+    // manually revoke the object URL to avoid memory leaks.
+    if (textFile !== null) {
+      window.URL.revokeObjectURL(textFile);
+    }
+
+    textFile = window.URL.createObjectURL(data);
+
+    return textFile;
+  };
+
+
+  function readTextFile(file)
   {
-    if(rawFile.readyState === 4)
+    var rawFile = new XMLHttpRequest();
+    var latflag =1 , lngflag =0;
+    var templat = "",templng = "";
+    List_lat = [] , List_lng = [];
+    rawFile.open("GET", file, false);
+    rawFile.onreadystatechange = function ()
     {
-      if(rawFile.status === 200 || rawFile.status == 0)
+      if(rawFile.readyState === 4)
       {
-        var allText = rawFile.responseText;
-        for (var i = 6; i < allText.length; i++) {
-          if(allText[i] == " "){
-            latflag = 0 , lngflag =1;
-            List_lng.push(templat) , templat = ""; 
-          }
+        if(rawFile.status === 200 || rawFile.status == 0)
+        {
+          var allText = rawFile.responseText;
+          for (var i = 6; i < allText.length; i++) {
+            if(allText[i] == " "){
+              latflag = 0 , lngflag =1;
+              List_lng.push(templat) , templat = ""; 
+            }
 
-          if(allText[i] == '\n'){
-            latflag = 1 , lngflag =0;
-            List_lat.push(templng) , templng = "";
-          }
+            if(allText[i] == '\n'){
+              latflag = 1 , lngflag =0;
+              List_lat.push(templng) , templng = "";
+            }
 
-          if(latflag==1 && lngflag==0 && allText[i] != " " && allText[i] != '\n')
-            templat += allText[i];
-          if(latflag==0 && lngflag==1 && allText[i] != " " && allText[i] != '\n')
-            templng += allText[i];
-        };
+            if(latflag==1 && lngflag==0 && allText[i] != " " && allText[i] != '\n')
+              templat += allText[i];
+            if(latflag==0 && lngflag==1 && allText[i] != " " && allText[i] != '\n')
+              templng += allText[i];
+          };
+        }
       }
     }
+
+    rawFile.send(null);
   }
-  rawFile.send(null);
-}
 
-function createMarker(latlng, name, html) {
-  var contentString = html;
-  var marker = new google.maps.Marker({
-    position: latlng,
-    map: map,
-  });
+  function createMarker(latlng, name, html) {
+    var contentString = html;
+    var final_data = [];
+    var marker = new google.maps.Marker({
+      position: latlng,
+      map: map,
+    });
 
-  google.maps.event.addListener(marker, 'click', function() {
-    infowindow.setContent(contentString); 
-    infowindow.open(map,marker);
-  });
-  google.maps.event.trigger(marker, 'click');    
-  marker.setAnimation(google.maps.Animation.BOUNCE);
-  var pointA = new google.maps.LatLng(latlng.lat(),latlng.lng());   
-  var radius = 300;                                
-  
-  
-  readTextFile("/home/vikas/Downloads/2016monsoonnotes/ES_notes/Es_Website/EQ_final.data");
-  
-  for (var i = 0; i < List_lat.length/5; i++) {
+    google.maps.event.addListener(marker, 'click', function() {
+      infowindow.setContent(contentString); 
+      infowindow.open(map,marker);
+    });
+    google.maps.event.trigger(marker, 'click');    
+    marker.setAnimation(google.maps.Animation.BOUNCE);
+    var pointA = new google.maps.LatLng(latlng.lat(),latlng.lng());   
+    var radius = 300;                                
+
+
+    readTextFile("/home/vikas/Downloads/2016monsoonnotes/ES_notes/Es_Website/EQ_final.data");
+
+    for (var i = 0; i < List_lat.length/5; i++) {
     if(parseFloat(pointA.distancefrom( parseFloat(List_lat[i]), parseFloat(List_lng[i]))) <= 300) //Everything within 300km radius
-      console.log(List_lat[i],List_lng[i]);
+      final_data.push(List_lat[i] + " " + List_lng[i] + '\n');
   };
+
+  document.addEventListener('click', function () {
+    var link = document.getElementById('downloadlink');
+    link.href = makeTextFile(final_data);
+    link.style.display = 'block';
+  }, false);
 
 
   var circle = new google.maps.Circle({
@@ -161,8 +185,9 @@ function initialize() {
      </td> 
      <td valign="top" style="width:150px; text-decoration: underline; color: #4444ff;"> 
        <div id="side_bar"></div> 
+       <a download="info.txt" id="downloadlink" style="display: none">Download</a> 
      </td> 
-   </tr> 
+   </tr>
  </table> 
 
 </body> 
