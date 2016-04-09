@@ -14,6 +14,8 @@
   var map = null;
   var marker = null;
   var circle = null;
+  var List_lat = [] , List_lng = [];
+
   Number.prototype.toRad = function() {
    return this * Math.PI / 180;
  }
@@ -40,6 +42,41 @@ var infowindow = new google.maps.InfoWindow(
   size: new google.maps.Size(150,50)
 });
 
+function readTextFile(file)
+{
+  var rawFile = new XMLHttpRequest();
+  var latflag =1 , lngflag =0;
+  var templat = "",templng = "";
+  List_lat = [] , List_lng = [];
+  rawFile.open("GET", file, false);
+  rawFile.onreadystatechange = function ()
+  {
+    if(rawFile.readyState === 4)
+    {
+      if(rawFile.status === 200 || rawFile.status == 0)
+      {
+        var allText = rawFile.responseText;
+        for (var i = 6; i < allText.length; i++) {
+          if(allText[i] == " "){
+            latflag = 0 , lngflag =1;
+            List_lng.push(templat) , templat = ""; 
+          }
+
+          if(allText[i] == '\n'){
+            latflag = 1 , lngflag =0;
+            List_lat.push(templng) , templng = "";
+          }
+
+          if(latflag==1 && lngflag==0 && allText[i] != " " && allText[i] != '\n')
+            templat += allText[i];
+          if(latflag==0 && lngflag==1 && allText[i] != " " && allText[i] != '\n')
+            templng += allText[i];
+        };
+      }
+    }
+  }
+  rawFile.send(null);
+}
 
 function createMarker(latlng, name, html) {
   var contentString = html;
@@ -57,8 +94,15 @@ function createMarker(latlng, name, html) {
   var pointA = new google.maps.LatLng(latlng.lat(),latlng.lng());   
   var radius = 300;                                
   
-  console.log(pointA.distancefrom(17.446118,78.348741));
   
+  readTextFile("/home/vikas/Downloads/2016monsoonnotes/ES_notes/Es_Website/EQ_final.data");
+  
+  for (var i = 0; i < List_lat.length/5; i++) {
+    if(parseFloat(pointA.distancefrom( parseFloat(List_lat[i]), parseFloat(List_lng[i]))) <= 300) //Everything within 300km radius
+      console.log(List_lat[i],List_lng[i]);
+  };
+
+
   var circle = new google.maps.Circle({
    center: pointA,
          radius: radius * 1000,       // Convert to meters
