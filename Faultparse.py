@@ -37,6 +37,3 @@ with open('Fault_proc.data') as f:
         outfile.write(str(len(data))+"\n")
         for entry in data:
             outfile.write(entry.replace(',', ' ')+"\n")
-            
-        
-        
