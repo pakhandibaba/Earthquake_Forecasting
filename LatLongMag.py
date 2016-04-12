@@ -13,7 +13,7 @@ for val in values:
         row = row.split()
         if len(row) >= 3:
             if val[0] == row[0] and val[1] == row[1]:
-                stri = row[0] + ' ' + row[1] + ' ' + row[2] + '\n'
+                stri = row[0] + '\n' + row[1] + '\n' + row[2] + '\n'
                 outfile.write(stri)
 
 infile.close()

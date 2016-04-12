@@ -4,11 +4,15 @@
   <meta name="viewport" content="initial-scale=1.0, user-scalable=no" /> 
   <meta http-equiv="content-type" content="text/html; charset=UTF-8"/> 
   <title>ES Project - maps</title> 
+  <script src="https://www.google.com/jsapi" type="text/javascript"></script>
+  <link rel="stylesheet" href="map.css"/>
   <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script> 
-
-  <style type="text/css">
-  html, body { height: 100%; } 
-  </style>
+  <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Julius+Sans+One">
+  <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Lobster">
+  <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Lobster+Two">
+  <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Indie Flower">
+  <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Monoton">
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 
   <script type="text/javascript"> 
   var map = null;
@@ -138,7 +142,9 @@ function makeTextFile(text) {
   return [marker,circle];
 }
 
-
+function altertable() {
+  document.getElementById("myTable").rows[3].cells[1].innerHTML = 5;
+}
 
 function initialize() {
 
@@ -170,25 +176,79 @@ function initialize() {
   circle = items[1]
 });
 
+  altertable();
+
 }
 
 
 </script> 
 
 </head> 
-<body style="margin:0px; padding:0px;" onload="initialize()"> 
+<body  onload="initialize()"> 
+  <div class="header-img" style= "top: -40px;">
+    <!-- <a href="http://www.masswerk.at/termlib/"><h3>Termlib.js</h3></a> -->
+    <a href="Trial_map.html"><h2>Earthquake Forecasting</h2></a>
+    <hr />
+  </div>
 
-  <table border="1"> 
+  <table border="4" class="floatedTable">
     <tr> 
       <td> 
-       <div id="map_canvas" style="width: 700px; height: 600px"></div> 
+       <div id="map_canvas" style="width: 1150px; height: 500px ;"></div> 
      </td> 
-     <td valign="top" style="width:150px; text-decoration: underline; color: #4444ff;"> 
+     <td valign="top" style="width:130px; text-decoration: underline; color: #4444ff;"> 
        <div id="side_bar"></div> 
        <a download="info.txt" id="downloadlink" style="display: none">Download</a> 
      </td> 
    </tr>
  </table> 
+ <table border="4" class="floatedTable" id = "myTable"> 
+  <tr>
+    <td valign="top" style="width:330px;">Magnitude Class</td>
+    <td>Fault ID</td>    
+  </tr>
+  <tr>
+    <td></td>
+    <td>F1</td>
+    <td>F2</td>    
+    <td>F3</td>
+    <td>F4</td>
+    <td>F5</td>
+  </tr>
+  <tr>
+    <td>3.5</td>
+    <td></td>    
+    <td></td>
+    <td></td>    
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>4.5</td>
+    <td></td>    
+    <td></td>
+    <td></td>    
+    <td></td>    
+    <td></td>
+  </tr>
+  <tr>
+    <td>5.5</td>
+    <td></td>    
+    <td></td>
+    <td></td>    
+    <td></td>
+    <td></td>    
+  </tr>
+  <tr>
+    <td>6.5</td>
+    <td></td>    
+    <td></td>
+    <td></td>
+    <td></td>    
+    <td></td>
+  </tr>
+
+</table>
 
 </body> 
 </html> 
