@@ -15,9 +15,9 @@ for val in values:
     val = val.split()
     for row in earthquakes:
         row = row.split()
-        if len(row) >= 4:
-            if val[0] == row[1] and val[1] == row[2]:
-                stri = row[1] + ' ' + row[2] + ' ' + row[3] + ' ' + row[0] + '\n'
+        if len(row) == 4:
+            if val[0] == row[0] and val[1] == row[1]:
+                stri = row[0] + ' ' + row[1] + ' ' + row[2] + ' ' + row[3] + '\n'
                 final = final + stri
                 cnt = cnt + 1
 
