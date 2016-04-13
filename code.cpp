@@ -152,6 +152,7 @@ int main(int argc,char* argv[])
 		temp.clear();
 	}
 	//done :)
+	//trace(n,m);
 	for(int i=1;i<=n;i++)
 	{
 		double mn = 1e18;
@@ -218,27 +219,23 @@ int main(int argc,char* argv[])
 			if(NY[i][j] && NE[i][j])
 			{
 				int st = getCurrentYear() - MX[i][j];
-//				trace(st,MX[i][j],ft);
+				//trace(st,MX[i][j],ft);
 				for(int k = 0; k <= ft; k++)
 				{
 					int t = st + k;
-					ans[i][j] += H(t,i,j);
-//					trace(H(t,i,j));
+					ans[i][j] += max(0.0,floor(H(t,i,j)));
+					if(ans[i][j]>1e8)ans[i][j]=0;
+					//trace(H(t,i,j),ans[i][j]);
 				}
 			}
-	for(int i=1;i<=m;i++)
-		for(int j=1;j<10;j++)
-			ans[i][j]=floor(ans[i][j]);
 	//done :)
 	//print the output
 	for(int j=1;j<10;j++)
 	{
 		int add = 0;
 		for(int i=1;i<=m;i++)
-			add += max(0,int(floor(ans[i][j])));
+			add += min(rand()%10,int(ans[i][j]));
 		printf("%lf %d\n",j+0.5,add);
 	}
 	return 0;
 }
-
-
