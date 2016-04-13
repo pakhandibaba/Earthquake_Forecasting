@@ -70,7 +70,7 @@ pair<double,double> linearRegression(const std::vector<double>& x, const std::ve
 double FF(double x)
 {
 	double sum = x, value = x;
-	for(int i=0;i<100;i++)
+	for(int i=1;i<=100;i++)
 	{
 		value = (value*x*x/(2*i+1));
 		sum += value;
@@ -96,32 +96,60 @@ int getCurrentYear()
 	struct tm *current = localtime(&timenow);
 	return current->tm_year+1900;
 }
+double rad2deg(double rad) {
+  return (rad * 180 / PI);
+}
+double deg2rad(double deg) {
+  return (deg * PI / 180);
+}
+double dist(point a,point b){
+	double lat1=a.x,lon1=a.y,lat2=b.x,lon2=b.y;
+  double theta, dist;
+  theta = lon1 - lon2;
+  dist = sin(deg2rad(lat1)) * sin(deg2rad(lat2)) + cos(deg2rad(lat1)) * cos(deg2rad(lat2)) * cos(deg2rad(theta));
+  dist = acos(dist);
+  dist = rad2deg(dist);
+  dist = dist * 60 * 1.1515;
+  dist = dist * 1.609344;
+  return (dist);
+}
 int main(int argc,char* argv[])
 {
+	point eq;
+	sscanf(argv[4],"%lf",&eq.x);
+	sscanf(argv[5],"%lf",&eq.y);
 	//read earthquake data
 	freopen(argv[1],"r",stdin);
-	int n;si(n);
+	int nn;si(nn);
+	int n = 1;
 	//trace(n);
-	for(int i=1;i<=n;i++)
+	for(int i=1;i<=nn;i++)
 	{
 		//x y magnitude year
-		double x;
-		scanf("%lf %lf %lf %d",&E[i].F.x,&E[i].F.y,&x,&E[i].S.S);
-		E[i].S.F = floor(x);
+		double x;pair<point,II> p;
+		scanf("%lf %lf %lf %d",&p.F.x,&p.F.y,&x,&p.S.S);
+		p.S.F = floor(x);
+		if(dist(p.F,eq)<300)E[n++]=p;
 	}
 	//read fault data
 	freopen(argv[2],"r",stdin);
-	int m;si(m);
+	int mm;si(mm);
+	int m = 1;
 	//trace(n,m);
-	for(int i=1;i<=m;i++)
+	for(int i=1;i<=mm;i++)
 	{
 		int x;si(x);
+		vector<point> temp;
+		bool ok = true;
 		while(x--)
 		{
 			point p;
 			scanf("%lf %lf",&p.x,&p.y);
-			F[i].PB(p);
+			temp.PB(p);
+			if(dist(p,eq) > 300)ok=false;
 		}
+		if(ok)F[m++]=temp;
+		temp.clear();
 	}
 	//done :)
 	for(int i=1;i<=n;i++)
@@ -190,10 +218,12 @@ int main(int argc,char* argv[])
 			if(NY[i][j] && NE[i][j])
 			{
 				int st = getCurrentYear() - MX[i][j];
+//				trace(st,MX[i][j],ft);
 				for(int k = 0; k <= ft; k++)
 				{
 					int t = st + k;
 					ans[i][j] += H(t,i,j);
+//					trace(H(t,i,j));
 				}
 			}
 	for(int i=1;i<=m;i++)
@@ -205,8 +235,10 @@ int main(int argc,char* argv[])
 	{
 		int add = 0;
 		for(int i=1;i<=m;i++)
-			add += ans[i][j];
-		printf("%d %d\n",j,add);
+			add += max(0,int(floor(ans[i][j])));
+		printf("%lf %d\n",j+0.5,add);
 	}
 	return 0;
 }
+
+
