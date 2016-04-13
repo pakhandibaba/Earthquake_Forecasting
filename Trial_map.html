@@ -116,30 +116,31 @@ function makeTextFile(text) {
     var pointA = new google.maps.LatLng(latlng.lat(),latlng.lng());   
     var radius = 300;                                
 
+    document.getElementById("myText").value = latlng.lat() + " " + latlng.lng();
+    
+    // readTextFile("/home/vikas/Downloads/2016monsoonnotes/ES_notes/Es_Website/EQ_final.data");
 
-    readTextFile("/home/vikas/Downloads/2016monsoonnotes/ES_notes/Es_Website/EQ_final.data");
+    // for (var i = 0; i < List_lat.length/5; i++) {
+    // if(parseFloat(pointA.distancefrom( parseFloat(List_lat[i]), parseFloat(List_lng[i]))) <= 300) //Everything within 300km radius
+      // final_data.push(List_lat[i] + " " + List_lng[i] + '\n');
+  // };
 
-    for (var i = 0; i < List_lat.length/5; i++) {
-    if(parseFloat(pointA.distancefrom( parseFloat(List_lat[i]), parseFloat(List_lng[i]))) <= 300) //Everything within 300km radius
-      final_data.push(List_lat[i] + " " + List_lng[i] + '\n');
-  };
-
-  document.addEventListener('click', function () {
-    var link = document.getElementById('downloadlink');
-    link.href = makeTextFile(final_data);
-    link.style.display = 'block';
-  }, false);
+  // document.addEventListener('click', function () {
+  //   var link = document.getElementById('downloadlink');
+  //   link.href = makeTextFile(final_data);
+  //   link.style.display = 'block';
+  // }, false);
 
 
-  var circle = new google.maps.Circle({
-   center: pointA,
+var circle = new google.maps.Circle({
+ center: pointA,
          radius: radius * 1000,       // Convert to meters
          fillColor: '#FF0000',
          fillOpacity: 0.2,
          map: map
        });
-  
-  return [marker,circle];
+
+return [marker,circle];
 }
 
 function altertable() {
@@ -176,7 +177,7 @@ function initialize() {
   circle = items[1]
 });
 
-  altertable();
+  // altertable();
 
 }
 
@@ -191,18 +192,27 @@ function initialize() {
     <hr />
   </div>
 
+  
   <table border="4" class="floatedTable">
     <tr> 
       <td> 
        <div id="map_canvas" style="width: 1150px; height: 500px ;"></div> 
      </td> 
-     <td valign="top" style="width:130px; text-decoration: underline; color: #4444ff;"> 
+     <td valign="top" style="width:100px; text-decoration: underline; color: #4444ff;"> 
        <div id="side_bar"></div> 
-       <a download="info.txt" id="downloadlink" style="display: none">Download</a> 
-     </td> 
-   </tr>
- </table> 
- <table border="4" class="floatedTable" id = "myTable"> 
+       <form action="" method="get">
+        Lat / Long :
+        <input type="text" id="myText" name ="latlong" value="" maxlength="60" />
+        <br />
+        Year: 
+        <input type="text" id = "yearid" name="year" value="" maxlength="20" />
+        <input type="submit" value="Submit" />
+      </form>
+      <!-- <a download="info.txt" id="downloadlink" style="display: none">Download</a> --> 
+    </td> 
+  </tr>
+</table> 
+<!-- <table border="4" class="floatedTable" id = "myTable"> 
   <tr>
     <td valign="top" style="width:330px;">Magnitude Class</td>
     <td>Fault ID</td>    
@@ -248,7 +258,7 @@ function initialize() {
     <td></td>
   </tr>
 
-</table>
+</table> -->
 
 </body> 
 </html> 
