@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+<head> 
+  <meta name="viewport" content="initial-scale=1.0, user-scalable=no" /> 
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8"/> 
+  <title>ES Project - maps</title> 
+  <script src="https://www.google.com/jsapi" type="text/javascript"></script>
+  <link rel="stylesheet" href="map.css"/>
+  <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script> 
+  <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Julius+Sans+One">
+  <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Lobster">
+  <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Lobster+Two">
+  <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Indie Flower">
+  <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Monoton">
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+
+  <script type="text/javascript"> 
+  var map = null;
+  var marker = null;
+  var circle = null;
+  var List_lat = [] , List_lng = [];
+  var textFile = null;
+
+  Number.prototype.toRad = function() {
+   return this * Math.PI / 180;
+ }
+
+ Number.prototype.toDeg = function() {
+   return this * 180 / Math.PI;
+ }
+ google.maps.LatLng.prototype.distancefrom = function(latB, lngB) {
+
+   // var lat1 = this.lat().toRad(), lon1 = this .lng().toRad();
+
+  var R = 6378137; // Earth’s mean radius in meter
+  var dLat = (latB - this.lat()).toRad();
+  var dLong = (lngB - this.lng()).toRad();
+  var a = Math.sin(dLat / 2) * Math.sin(dLat/2) + Math.cos(this.lat().toRad()) * Math.cos(latB.toRad()) * Math.sin(dLong / 2)*Math.sin(dLong/2);
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  var d = R * c;
+  return d/1000;
+}
+
+
+var infowindow = new google.maps.InfoWindow(
+{ 
+  size: new google.maps.Size(150,50)
+});
+
+function makeTextFile(text) {
+  var data = new Blob([text], {type: 'text/plain'});
+
+    // If we are replacing a previously generated file we need to
+    // manually revoke the object URL to avoid memory leaks.
+    if (textFile !== null) {
+      window.URL.revokeObjectURL(textFile);
+    }
+
+    textFile = window.URL.createObjectURL(data);
+
+    return textFile;
+  };
+
+
+  function readTextFile(file)
+  {
+    var rawFile = new XMLHttpRequest();
+    var latflag =1 , lngflag =0;
+    var templat = "",templng = "";
+    List_lat = [] , List_lng = [];
+    rawFile.open("GET", file, false);
+    rawFile.onreadystatechange = function ()
+    {
+      if(rawFile.readyState === 4)
+      {
+        if(rawFile.status === 200 || rawFile.status == 0)
+        {
+          var allText = rawFile.responseText;
+          for (var i = 6; i < allText.length; i++) {
+            if(allText[i] == " "){
+              latflag = 0 , lngflag =1;
+              List_lng.push(templat) , templat = ""; 
+            }
+
+            if(allText[i] == '\n'){
+              latflag = 1 , lngflag =0;
+              List_lat.push(templng) , templng = "";
+            }
+
+            if(latflag==1 && lngflag==0 && allText[i] != " " && allText[i] != '\n')
+              templat += allText[i];
+            if(latflag==0 && lngflag==1 && allText[i] != " " && allText[i] != '\n')
+              templng += allText[i];
+          };
+        }
+      }
+    }
+
+    rawFile.send(null);
+  }
+
+  function createMarker(latlng, name, html) {
+    var contentString = html;
+    var final_data = [];
+    var marker = new google.maps.Marker({
+      position: latlng,
+      map: map,
+    });
+
+    google.maps.event.addListener(marker, 'click', function() {
+      infowindow.setContent(contentString); 
+      infowindow.open(map,marker);
+    });
+    google.maps.event.trigger(marker, 'click');    
+    marker.setAnimation(google.maps.Animation.BOUNCE);
+    var pointA = new google.maps.LatLng(latlng.lat(),latlng.lng());   
+    var radius = 300;                                
+
+    document.getElementById("myText").value = latlng.lat() + " " + latlng.lng();
+    
+    // readTextFile("/home/vikas/Downloads/2016monsoonnotes/ES_notes/Es_Website/EQ_final.data");
+
+    // for (var i = 0; i < List_lat.length/5; i++) {
+    // if(parseFloat(pointA.distancefrom( parseFloat(List_lat[i]), parseFloat(List_lng[i]))) <= 300) //Everything within 300km radius
+      // final_data.push(List_lat[i] + " " + List_lng[i] + '\n');
+  // };
+
+  // document.addEventListener('click', function () {
+  //   var link = document.getElementById('downloadlink');
+  //   link.href = makeTextFile(final_data);
+  //   link.style.display = 'block';
+  // }, false);
+
+
+var circle = new google.maps.Circle({
+ center: pointA,
+         radius: radius * 1000,       // Convert to meters
+         fillColor: '#FF0000',
+         fillOpacity: 0.2,
+         map: map
+       });
+
+return [marker,circle];
+}
+
+function altertable() {
+  document.getElementById("myTable").rows[3].cells[1].innerHTML = 5;
+}
+
+function initialize() {
+
+  var myOptions = {
+    zoom: 9,
+    center: new google.maps.LatLng(17.446118, 78.348741),
+    mapTypeControl: true,
+    mapTypeControlOptions: {style: google.maps.MapTypeControlStyle.DROPDOWN_MENU},
+    navigationControl: true,
+    mapTypeId: google.maps.MapTypeId.ROADMAP
+  }
+  map = new google.maps.Map(document.getElementById("map_canvas"),
+    myOptions);
+
+  google.maps.event.addListener(map, 'click', function() {
+    infowindow.close();
+  });
+
+  google.maps.event.addListener(map, 'click', function(event) {
+
+   if (marker) {
+    marker.setMap(null);
+    marker = null;
+    circle.setMap(null);
+    circle = null;
+  }
+  var items = createMarker(event.latLng, "name", "<b>Location</b><br>"+event.latLng);
+  marker = items[0]
+  circle = items[1]
+});
+
+  // altertable();
+
+}
+
+
+</script> 
+
+</head> 
+<body  onload="initialize()"> 
+  <div class="header-img" style= "top: -40px;">
+    <!-- <a href="http://www.masswerk.at/termlib/"><h3>Termlib.js</h3></a> -->
+    <a href="Trial_map.html"><h2>Earthquake Forecasting</h2></a>
+    <hr />
+  </div>
+
+  
+  <table border="4" class="floatedTable">
+    <tr> 
+      <td> 
+       <div id="map_canvas" style="width: 1150px; height: 500px ;"></div> 
+     </td> 
+     <td valign="top" style="width:100px; text-decoration: underline; color: #4444ff;"> 
+       <div id="side_bar"></div>
+       <form action="http://127.0.0.1:8000/forecast/process" method="get">
+        Lat / Long :
+        <input type="text" id="myText" name ="latlong" value="" maxlength="60" />
+        <br />
+        Year: 
+        <input type="text" id = "yearid" name="year" value="" maxlength="20" />
+        <input type="submit" value="Submit" />
+      </form>
+      <!-- <a download="info.txt" id="downloadlink" style="display: none">Download</a> --> 
+    </td> 
+  </tr>
+</table> 
+<!-- <table border="4" class="floatedTable" id = "myTable"> 
+  <tr>
+    <td valign="top" style="width:330px;">Magnitude Class</td>
+    <td>Fault ID</td>    
+  </tr>
+  <tr>
+    <td></td>
+    <td>F1</td>
+    <td>F2</td>    
+    <td>F3</td>
+    <td>F4</td>
+    <td>F5</td>
+  </tr>
+  <tr>
+    <td>3.5</td>
+    <td></td>    
+    <td></td>
+    <td></td>    
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>4.5</td>
+    <td></td>    
+    <td></td>
+    <td></td>    
+    <td></td>    
+    <td></td>
+  </tr>
+  <tr>
+    <td>5.5</td>
+    <td></td>    
+    <td></td>
+    <td></td>    
+    <td></td>
+    <td></td>    
+  </tr>
+  <tr>
+    <td>6.5</td>
+    <td></td>    
+    <td></td>
+    <td></td>
+    <td></td>    
+    <td></td>
+  </tr>
+
+</table> -->
+
+</body> 
+</html> 
