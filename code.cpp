@@ -121,7 +121,7 @@ int main(int argc,char* argv[])
 	//read earthquake data
 	freopen(argv[1],"r",stdin);
 	int nn;si(nn);
-	int n = 1;
+	int n = 0;
 	//trace(n);
 	for(int i=1;i<=nn;i++)
 	{
@@ -129,12 +129,12 @@ int main(int argc,char* argv[])
 		double x;pair<point,II> p;
 		scanf("%lf %lf %lf %d",&p.F.x,&p.F.y,&x,&p.S.S);
 		p.S.F = floor(x);
-		if(dist(p.F,eq)<300)E[n++]=p;
+		if(dist(p.F,eq)<300)E[++n]=p;
 	}
 	//read fault data
 	freopen(argv[2],"r",stdin);
 	int mm;si(mm);
-	int m = 1;
+	int m = 0;
 	//trace(n,m);
 	for(int i=1;i<=mm;i++)
 	{
@@ -148,7 +148,7 @@ int main(int argc,char* argv[])
 			temp.PB(p);
 			if(dist(p,eq) > 300)ok=false;
 		}
-		if(ok)F[m++]=temp;
+		if(ok)F[++m]=temp;
 		temp.clear();
 	}
 	//done :)
@@ -228,14 +228,23 @@ int main(int argc,char* argv[])
 					//trace(H(t,i,j),ans[i][j]);
 				}
 			}
+
 	//done :)
 	//print the output
+    int ANS[11];SET(ANS,0);
+    int mx = -1,sc = (ft / 10 + 1)*13;
 	for(int j=1;j<10;j++)
 	{
 		int add = 0;
 		for(int i=1;i<=m;i++)
-			add += min(rand()%10,int(ans[i][j]));
-		printf("%lf %d\n",j+0.5,add);
-	}
+			add += int(ans[i][j]);
+        ANS[j]=add;
+        mx = max(mx,add);
+    }
+    if(mx > sc)
+        for(int j=1;j<10;j++)
+                ANS[j]=((ANS[j]*sc)/mx);
+    for(int j=1;j<10;j++)
+    	printf("%lf %d\n",j+0.5,ANS[j]);
 	return 0;
 }
